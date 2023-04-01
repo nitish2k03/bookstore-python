@@ -307,6 +307,7 @@ def adm_panel(ida,passwa):
         
 
     books_show(None)
+    print("success")
 
     def users_show(event):
         canvas3.itemconfig(but2,image=users_s)
