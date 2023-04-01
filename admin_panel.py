@@ -376,7 +376,7 @@ def adm_panel(ida,passwa):
             avatar_entry.delete(0,END)
             role_entry.delete(0,END)
 
-        selection2=Button(canvas3,text="Fetch Selected Record",command=sel2)
+        selection2=Button(canvas3,text="Fetch Record",command=sel2)
         selection2.place(relheight=0.05,relwidth=0.1,relx=0.5,rely=0.54)
 
         def upd_tree():
