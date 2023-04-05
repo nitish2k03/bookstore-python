@@ -93,7 +93,11 @@ def check(event):
 
 def reg_cancel():
     window1.destroy()
-    # window4.destroy()
+    login()
+
+def reg_cancel2():
+    window1.destroy()
+    window4.destroy()
     login()
 
 def register_u(event):
@@ -190,7 +194,7 @@ def register(event):
         
         b1=Button(window4,text="Register",bg="white",command=lambda :register_user("<Button-1>"))
         b1.place(x=210,y=350)
-        b2=Button(window4,text="Exit",bg="white",command=reg_cancel)
+        b2=Button(window4,text="Exit",bg="white",command=reg_cancel2)
         b2.place(x=370,y=350)
         b3=Button(window4,text="Back",bg="white",command=lambda :register_ag("<Button-1>"))
         b3.place(x=290,y=350)

@@ -91,7 +91,6 @@ def adm_panel(ida,passwa):
         canvas3.itemconfig(but2,image=users_u)
         canvas3.tag_bind(but2,"<Button-1>",users_change)
         data.destroy()
-    
     def users_change(event):
         canvas3.itemconfig(but2,image=users_s)
         canvas3.tag_bind(but2,"<Button-1>",users_unchange)

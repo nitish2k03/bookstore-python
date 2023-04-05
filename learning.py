@@ -1,5 +1,5 @@
 # import oracledb
-# from tkinter import *
+from tkinter import *
 # from PIL import ImageTk,Image,ImageDraw
 
 # con=oracledb.connect(user='C##Nitish',password='123',dsn='192.168.19.1/orcl')
@@ -175,17 +175,8 @@
 
 
 
-
-def nit():
-    print("Hello")
-
-
-def new():
-    global nit
-    def nit():
-        print("Hello1")
-
-new()
-
-nit()
-
+root=Tk()
+root.title("Login Page")
+root.minsize(height="750",width="1500")
+root.maxsize(height="750",width="1500")
+mainloop()
