@@ -177,6 +177,6 @@ from tkinter import *
 
 root=Tk()
 root.title("Login Page")
-root.minsize(height="750",width="1500")
-root.maxsize(height="750",width="1500")
+root.minsize(height="700",width="1500")
+root.maxsize(height="700",width="1500")
 mainloop()
