@@ -69,6 +69,6 @@ def logged(ida,passwa):
         data.insert(parent="",index="end",iid=i[0],values=i,tags=('even' if count%2==0 else 'odd',))
         count+=1
 
-
     update_time()
+
     window.mainloop()
