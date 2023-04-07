@@ -86,8 +86,12 @@ def logged(ida,passwa):
         window.destroy()
         main.login()
     label1.bind("<Button-1>",logout_method)
-    label1.bind("<Enter>",main.on_enter)
-    label1.bind("<Leave>",main.on_leave)
+    def on_enter(event):
+        window.configure(cursor="hand2")
+    def on_leave(event):
+        window.configure(cursor="")
+    label1.bind("<Enter>",on_enter)
+    label1.bind("<Leave>",on_leave)
     
     cart=ttk.Treeview(window,columns=("Id","Name","Price","Quantity","Amount"),selectmode="browse")
     cart.column("#0",width=0,stretch=NO)
