@@ -434,7 +434,6 @@ def adm_panel(ida,passwa):
         b4.place(relheight=0.6,relwidth=0.15,relx=0.82,rely=0.1)
 
     window3.mainloop()
-    con.close()
     
 
 

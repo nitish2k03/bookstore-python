@@ -84,7 +84,6 @@ def check(event):
     data=cur.fetchall()
     if (data):
         window.withdraw()
-        con.close()
         if(data[0][3]=="admin"):
             admin_panel.adm_panel(e1.get(),e2.get())
         else:
@@ -225,7 +224,6 @@ def register_user(event):
 
 def exit(event):
     window.destroy()
-    con.close()
 
 def show(event):
     e2.config(show="") 
