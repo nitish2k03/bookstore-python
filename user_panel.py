@@ -4,6 +4,7 @@ from tkinter import ttk,messagebox
 from PIL import ImageTk,Image
 import main
 from datetime import datetime
+import os
 
 con=oracledb.connect(user="C##Nitish",password="123",dsn="192.168.19.1/orcl")
 cur=con.cursor()
@@ -257,6 +258,7 @@ def logged(ida,passwa):
             for book in cur.fetchall():
                 data.insert("",END,values=book,tags=('even' if count%2==0 else 'odd',))
                 count+=1
+            os.startfile(f"D:/python/Invoices/Invoice_{no+1}.pdf")
         but1=Button(root,text="Generate Invoice",command=lambda:generate_invoice())
         but1.place(relx=0.5,rely=0.5,anchor=CENTER)
         root.mainloop()
