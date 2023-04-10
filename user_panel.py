@@ -72,10 +72,10 @@ def logged(ida,passwa):
     global cart_count,cart_amount
     cart_count=0
     cart_amount=0.0
-    cart_label=Label(window,text=f"CART ITEMS:[{cart_count}]",bg="#808080",fg="#FFFFFF")
+    cart_label=Label(window,text=f"CART ITEMS : [ {cart_count} ]",bg="#808080",fg="#FFFFFF")
     cart_label.place(relx=0.68,rely=0.17,relwidth=0.3085)
 
-    cart_amt=Label(window,text=f"CART TOTAL:[{cart_amount}]",bg="#808080",fg="#FFFFFF")
+    cart_amt=Label(window,text=f"CART TOTAL : [ {cart_amount} ]",bg="#808080",fg="#FFFFFF")
     cart_amt.place(relx=0.68,rely=0.8,relwidth=0.3085)
 
     label3=Label(window, text="Book Id")
@@ -104,15 +104,15 @@ def logged(ida,passwa):
                         data.item(curItem)['values'][5],entry1.get(),float("{:.2f}".format(float(data.item(curItem)['values'][5])*int(entry1.get())))))
                         cart_amount=cart_amount-float(prev_amt)+float("{:.2f}".format(float(data.item(curItem)['values'][5])*int(entry1.get())))
                         cart_amount=float("{:.2f}".format(cart_amount))
-                        cart_amt.config(text=f"CART TOTAL:[{cart_amount}]")
+                        cart_amt.config(text=f"CART TOTAL : [ {cart_amount} ]")
                         return
                 cart.insert(parent="",index="end",iid=data.item(curItem)['values'][0],values=(data.item(curItem)['values'][0],data.item(curItem)['values'][1],
                 data.item(curItem)['values'][5],entry1.get(),float("{:.2f}".format(float(data.item(curItem)['values'][5])*int(entry1.get())))))
                 cart_count+=1
                 cart_amount+=float("{:.2f}".format(float(data.item(curItem)['values'][5])*int(entry1.get())))
                 cart_amount=float("{:.2f}".format(cart_amount))
-                cart_amt.config(text=f"CART TOTAL:[{cart_amount}]")
-                cart_label.config(text=f"CART ITEMS:[{cart_count}]")
+                cart_amt.config(text=f"CART TOTAL : [ {cart_amount} ]")
+                cart_label.config(text=f"CART ITEMS : [ {cart_count} ]")
     butt1=Button(window,text="Add to Cart ->",command=add_to_cart)
     butt1.place(relx=0.56,rely=0.6)
     def update_info(event):
@@ -150,14 +150,14 @@ def logged(ida,passwa):
 
     update_time()
 
-    cart_img=Image.open("./media/cart.png").resize((45,45),Image.LANCZOS)
+    cart_img=Image.open("./media/cart.png").resize((70,70),Image.LANCZOS)
     cart_img=ImageTk.PhotoImage(cart_img,master=canvas)
     cart_but=canvas.create_image(1300,600,image=cart_img,anchor=NW)
     def cart_window():
         cart_window=Toplevel(window)
         cart_window.geometry("400x400")
         cart_window.resizable(False,False)
-        cart_window.title("Cart")
+        cart_window.title("Bill")
         cart_window.configure(bg="#808080")
         cart_window.grab_set()
         cart_window.focus_set()
@@ -167,5 +167,33 @@ def logged(ida,passwa):
     canvas.tag_bind(cart_but,"<Button-1>",lambda event:cart_window())
     canvas.tag_bind(cart_but,"<Enter>",lambda event:canvas.configure(cursor="hand2"))
     canvas.tag_bind(cart_but,"<Leave>",lambda event:canvas.configure(cursor=""))
+
+    def del_cart():
+        global cart_count,cart_amount
+        curItem=cart.focus()
+        cart_amount-=float(cart.item(curItem)['values'][4])
+        cart_amount=float("{:.2f}".format(cart_amount))
+        cart_amt.config(text=f"CART TOTAL : [ {cart_amount} ]")
+        cart_count-=1
+        cart_label.config(text=f"CART ITEMS : [ {cart_count} ]")
+        cart.delete(curItem)
+    remo_but=Button(window,text="Remove",command=del_cart)
+    remo_but.place(relx=0.82,rely=0.9)
+
+    def cle_cart():
+        global cart_count,cart_amount
+        cart_amount=0.0
+        cart_count=0
+        cart_label.config(text=f"CART ITEMS : [ {cart_count} ]")
+        cart_amt.config(text=f"CART TOTAL : [ {cart_amount} ]")
+        cart.delete(*cart.get_children())
+    clear=Button(window,text="Clear Cart",command=cle_cart)
+    clear.place(relx=0.72,rely=0.9)
+
+
+
+
+
+
 
     window.mainloop()
