@@ -69,7 +69,7 @@ def logged(ida,passwa):
         data.insert(parent="",index="end",iid=i[0],values=i,tags=('even' if count%2==0 else 'odd',))
         count+=1
 
-    global cart_count,cart_amount
+    global cart_count,cart_amount,cart
     cart_count=0
     cart_amount=0.0
     cart_label=Label(window,text=f"CART ITEMS : [ {cart_count} ]",bg="#808080",fg="#FFFFFF")
@@ -153,20 +153,114 @@ def logged(ida,passwa):
     cart_img=Image.open("./media/cart.png").resize((70,70),Image.LANCZOS)
     cart_img=ImageTk.PhotoImage(cart_img,master=canvas)
     cart_but=canvas.create_image(1300,600,image=cart_img,anchor=NW)
-    def cart_window():
-        cart_window=Toplevel(window)
-        cart_window.geometry("400x400")
-        cart_window.resizable(False,False)
-        cart_window.title("Bill")
-        cart_window.configure(bg="#808080")
-        cart_window.grab_set()
-        cart_window.focus_set()
-        cart_window.transient(window)
-        cart_window.protocol("WM_DELETE_WINDOW",lambda:cart_window.destroy())
-        cart_window.mainloop()
     canvas.tag_bind(cart_but,"<Button-1>",lambda event:cart_window())
     canvas.tag_bind(cart_but,"<Enter>",lambda event:canvas.configure(cursor="hand2"))
     canvas.tag_bind(cart_but,"<Leave>",lambda event:canvas.configure(cursor=""))
+    def cart_window():
+        if(cart_count==0):
+            messagebox.showerror("Error","Cart is empty")
+            return
+        root=Toplevel(window)
+        root.title("Customer Details")
+        root.geometry("400x400")
+        root.resizable(0,0)
+        lbl1=Label(root,text="Customer Details")
+        lbl1.place(relx=0.5,rely=0.1,anchor=CENTER)
+        lbl2=Label(root,text="Name")
+        lbl2.place(relx=0.2,rely=0.2,anchor=CENTER)
+        lbl3=Label(root,text="Contact No")
+        lbl3.place(relx=0.2,rely=0.3,anchor=CENTER)
+        inp1=Entry(root)
+        inp1.place(relx=0.5,rely=0.2,anchor=CENTER)
+        inp2=Entry(root)
+        inp2.place(relx=0.5,rely=0.3,anchor=CENTER)
+
+        def generate_invoice():
+            global cart,cart_amount
+            s_no=1
+            if(inp1.get()=="" or inp2.get()==""):
+                messagebox.showerror("Error","Please enter all details")
+                return
+            name=inp1.get()
+            contact=inp2.get()
+            lbl4=Label(root,text="Generating Invoice...")
+            lbl4.place(relx=0.5,rely=0.8,anchor=CENTER)
+            root.update()
+            no=cur.execute("select max(inv_id) from transactions").fetchone()[0]
+            filename=f"./Invoices/Invoice_{no+1}.pdf"
+            cur.execute("insert into transactions(inv_id, cust_name, user_id, inv_path) values(:1,:2,:3,:4)",(no+1, name, ida, f"D:/python/Invoices/Invoice_{no+1}.pdf"))
+            con.commit()
+            title=f"Invoice_{no+1}"
+            from reportlab.pdfgen import canvas
+            pdf=canvas.Canvas(filename,pagesize=(200,270),bottomup=0)
+            pdf.drawImage("./media/logo_inv.png",14,10,width=50,height=30)
+            pdf.setTitle(title)
+            pdf.setFont("Helvetica-Bold",8)
+            pdf.drawCentredString(125,20,"Book Store Pvt Limited")
+            pdf.setFont("Helvetica",5)
+            pdf.drawString(80,28,"Contact : 1234567890")
+            pdf.drawString(80,34,"Email : xyz@bookstore.in")
+            pdf.drawString(80,40,"Address : 123, ABC Street, XYZ City, 123456")
+            pdf.line(5,45,195,45)
+            pdf.setFont("Courier-Bold",8)
+            pdf.drawCentredString(100,55,"TAX-INVOICE")
+            pdf.roundRect(15,63,170,40,1,stroke=1,fill=0)
+            pdf.setFont("Times-Bold",5)
+            pdf.drawString(20,71,"Customer Name : " + name)
+            pdf.drawString(20,79,"Customer Contact :" + contact)
+            pdf.drawString(20,95,"Invoice No. : " + str(no+1))
+            pdf.drawString(20,87, "Created On : " + datetime.now().strftime("%d-%m-%Y %I:%M:%S %p"))
+            pdf.roundRect(15,108,170,130,1,stroke=1,fill=0)
+            pdf.line(15,120,185,120)
+            pdf.drawString(17,118,"S.No.")
+            pdf.drawString(31,118,"Book ID")
+            pdf.drawString(70,118,"DESCRIPTION")
+            pdf.drawString(127,118,"RATE")
+            pdf.drawString(147,118,"QTY")
+            pdf.drawString(165,118,"TOTAL")
+            pdf.line(15,210,185,210)
+            pdf.line(30,108,30,220)
+            pdf.line(50,108,50,220)
+            pdf.line(125,108,125,220)
+            pdf.line(145,108,145,220)
+            pdf.line(160,108,160,220)
+            y=128
+            for inv_data in cart.get_children():
+                pdf.drawString(18,y,str(s_no))
+                pdf.drawString(34,y, str(cart.item(inv_data)["values"][0]))
+                pdf.drawString(52,y, str(cart.item(inv_data)["values"][1]))
+                pdf.drawString(127,y,str(cart.item(inv_data)["values"][2]))
+                pdf.drawString(148,y, str(cart.item(inv_data)["values"][3]))
+                pdf.drawString(165,y, str(cart.item(inv_data)["values"][4]))
+                s_no+=1
+                y+=6
+                cur.execute("update books set stock=stock-:1 where b_id=:2",(int(cart.item(inv_data)["values"][3]),int(cart.item(inv_data)["values"][0])))
+                con.commit()
+
+            pdf.drawString(146,217,"Total:")
+            pdf.drawString(165,217,f"{cart_amount}")
+            pdf.line(15,220,185,220)
+            pdf.line(100,220,100,238)
+            pdf.drawString(28,225,"Terms - Due on receipt")
+            pdf.drawString(20,235,"(This is system generated invoice)")
+            pdf.setFont("Times-Bold",5)
+            pdf.drawRightString(165,230,"(Includes 12 % GST)")
+            pdf.setFont("Times-Bold",5)
+            pdf.drawRightString(180,260,"Signature")
+            pdf.save()
+            messagebox.showinfo("Success","Invoice Generated Successfully !")
+            root.destroy()
+            cle_cart()
+            data.delete(*data.get_children())
+            cur.execute("select * from books")
+            count=0
+            for book in cur.fetchall():
+                data.insert("",END,values=book,tags=('even' if count%2==0 else 'odd',))
+                count+=1
+        but1=Button(root,text="Generate Invoice",command=lambda:generate_invoice())
+        but1.place(relx=0.5,rely=0.5,anchor=CENTER)
+        root.mainloop()
+        
 
     def del_cart():
         global cart_count,cart_amount
