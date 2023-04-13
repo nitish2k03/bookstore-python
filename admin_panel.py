@@ -267,9 +267,6 @@ def adm_panel(ida,passwa):
             if(len(id_entry.get())==0 or len(title_entry.get())==0  or len(author_entry.get())==0 or len(genre_entry.get())==0 or len(stock_entry.get())==0 or len(price_entry.get())==0):
                 messagebox.showerror("Error","All Fields Are Required")
                 return
-            if(num(id_entry.get).isnumeric()==False):
-                messagebox.showerror("Error","ID Must Be Numeric")
-                return
             try:
                 cur.execute("INSERT INTO books VALUES(:1,:2,:3,:4,:5,:6)",(id_entry.get(),title_entry.get(),author_entry.get(),genre_entry.get(),stock_entry.get(),price_entry.get()))
                 con.commit()
