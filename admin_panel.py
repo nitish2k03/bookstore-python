@@ -264,8 +264,11 @@ def adm_panel(ida,passwa):
                 count+=1
 
         def add_book():
-            if(len(id_entry.get())==0 or len(title_entry.get())==0 ):
+            if(len(id_entry.get())==0 or len(title_entry.get())==0  or len(author_entry.get())==0 or len(genre_entry.get())==0 or len(stock_entry.get())==0 or len(price_entry.get())==0):
                 messagebox.showerror("Error","All Fields Are Required")
+                return
+            if(id_entry.get.isnumeric()==False):
+                messagebox.showerror("Error","ID Must Be Numeric")
                 return
             try:
                 cur.execute("INSERT INTO books VALUES(:1,:2,:3,:4,:5,:6)",(id_entry.get(),title_entry.get(),author_entry.get(),genre_entry.get(),stock_entry.get(),price_entry.get()))
@@ -280,6 +283,9 @@ def adm_panel(ida,passwa):
             if(len(id_entry.get())==0):
                 messagebox.showerror("Error","ID Field is Required")
                 return
+            if(id_entry.get not in data.get_children()):
+                messagebox.showerror("Error","Book Doesn't Exist")
+                return
             try:
                 cur.execute("DELETE FROM books WHERE b_id=:1",(id_entry.get(),))
                 con.commit()
@@ -292,6 +298,12 @@ def adm_panel(ida,passwa):
         def upd_book():
             if(len(id_entry.get())==0):
                 messagebox.showerror("Error","All Fields Are Required")
+                return
+            if(id_entry.get not in data.get_children()):
+                messagebox.showerror("Error","Book Doesn't Exist")
+                return
+            if(id_entry.get.isnumeric()==False):
+                messagebox.showerror("Error","ID Must Be Numeric")
                 return
             try:
                 cur.execute("UPDATE books SET title=:1,author=:2,genre=:3,stock=:4,price=:5 WHERE b_id=:6",(title_entry.get(),author_entry.get(),genre_entry.get(),stock_entry.get(),price_entry.get(),id_entry.get()))
