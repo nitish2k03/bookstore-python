@@ -1,6 +1,6 @@
 from tkinter import *
 from PIL import ImageTk,Image
-import main
+import common_func as main
 import oracledb
 from tkinter import ttk
 from tkinter import messagebox 

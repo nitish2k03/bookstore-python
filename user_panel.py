@@ -2,7 +2,7 @@ import oracledb
 from tkinter import *
 from tkinter import ttk,messagebox
 from PIL import ImageTk,Image
-import main
+import common_func as main
 from datetime import datetime
 import os
 
