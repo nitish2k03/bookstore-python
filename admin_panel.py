@@ -5,7 +5,7 @@ import oracledb
 from tkinter import ttk
 from tkinter import messagebox 
 
-con=oracledb.connect(user="C##Nitish",password="123",dsn="192.168.19.1/orcl")
+con=oracledb.connect(user="C##Nitish",password="123",dsn="Nitish/orcl")
 cur=con.cursor()
 
 def adm_panel(ida,passwa):
@@ -81,7 +81,7 @@ def adm_panel(ida,passwa):
             canvas3.itemconfig(but2,image=users_u)  
             canvas3.tag_bind(but2,"<Button-1>",users_change)
             canvas3.itemconfig(but3,image=trans_u)  
-            # canvas3.tag_bind(but3,"<Button-1>",trans_change)
+            canvas3.tag_bind(but3,"<Button-1>",trans_change)
         books_show(event)
         selection2.place_forget()
         records_frame.place_forget()
@@ -99,12 +99,29 @@ def adm_panel(ida,passwa):
             canvas3.itemconfig(but1,image=books_u)
             canvas3.tag_bind(but1,"<Button-1>",books_change)
             canvas3.itemconfig(but3,image=trans_u)
-            # canvas3.tag_bind(but3,"<Button-1>",trans_change)
+            canvas3.tag_bind(but3,"<Button-1>",trans_change)
         search_box.place_forget()
         record_frame.place_forget()
         book_frame.place_forget()
         selection1.place_forget()
         users_show(event)
+
+    def trans_unchange(event):
+        canvas3.itemconfig(but3,image=trans_u)
+        canvas3.tag_bind(but3,"<Button-1>",trans_change)
+        data.destroy()
+
+    def trans_change(event):
+        canvas3.itemconfig(but3,image=trans_s)
+        canvas3.tag_bind(but3,"<Button-1>",trans_unchange)
+        if data:
+            data.destroy()
+            canvas3.itemconfig(but1,image=books_u)
+            canvas3.tag_bind(but1,"<Button-1>",books_change)
+            canvas3.itemconfig(but2,image=users_u)
+            canvas3.tag_bind(but2,"<Button-1>",users_change)
+        trans_show(event)
+
 
 
     but1=canvas3.create_image(30,400,image=books_u,anchor=NW)
@@ -118,7 +135,7 @@ def adm_panel(ida,passwa):
     canvas3.tag_bind(but2,"<Leave>",on_leave)
 
     but3=canvas3.create_image(30,500,image=trans_u,anchor=NW)
-    # canvas3.tag_bind(but3,"<Button-1>",transactions_show)
+    canvas3.tag_bind(but3,"<Button-1>",trans_change)
     canvas3.tag_bind(but3,"<Enter>",on_enter)
     canvas3.tag_bind(but3,"<Leave>",on_leave)
 
@@ -433,7 +450,29 @@ def adm_panel(ida,passwa):
         b4=Button(user_frame,text="Clear All Fields",command=clea)
         b4.place(relheight=0.6,relwidth=0.15,relx=0.82,rely=0.1)
 
+    def trans_show(event):
+        canvas3.itemconfigure(but3,image=trans_s) 
+        global data
+        data=ttk.Treeview(canvas3,columns=("inv_id","name","user","path","date"),show="headings")
+        data.tag_configure('odd',background="white")
+        data.tag_configure('even',background="lightblue")
+        data.column("inv_id",width=40,anchor="center")
+        data.column("name",anchor="center")
+        data.column("user",anchor="center")
+        data.column("path",anchor="center")
+        data.column("date",anchor="center")
+        data.heading("inv_id",text="Invoice Id")
+        data.heading("name",text="Customer Name")
+        data.heading("user",text="Billing Clerk")
+        data.heading("path",text="Invoice Path")
+        data.heading("date",text="Date Created")
+        data.place(relheight=0.4,relwidth=0.8,relx=0.18,rely=0.1)
+        cur.execute("select * from transactions")
+        bot=cur.fetchall()
+        count=0
+        for i in bot:
+            data.insert(parent="",index="end",iid=i[0],values=i,tags=('even' if count%2==0 else 'odd',))
+            count+=1
+        
+
     window3.mainloop()
-    
-
-

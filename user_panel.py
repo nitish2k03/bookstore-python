@@ -6,7 +6,7 @@ import main
 from datetime import datetime
 import os
 
-con=oracledb.connect(user="C##Nitish",password="123",dsn="192.168.19.1/orcl")
+con=oracledb.connect(user="C##Nitish",password="123",dsn="Nitish/orcl")
 cur=con.cursor()
 
 def logged(ida,passwa):

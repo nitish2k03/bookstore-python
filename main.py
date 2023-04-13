@@ -5,7 +5,8 @@ from tkinter import messagebox
 import user_panel
 import admin_panel
 
-con=oracledb.connect(user="C##Nitish",password="123",dsn="192.168.19.1/orcl")
+
+con=oracledb.connect(user="c##nitish",password="123",dsn="Nitish/orcl")
 print("Successfully connected to Oracle Database")
 cur=con.cursor()
 
