@@ -408,6 +408,12 @@ def adm_panel(ida,passwa):
             if(id_entry.get()=="" or pass_entry.get()=="" or avatar_entry.get()=="" or role_entry.get()==""):
                 messagebox.showerror("Error","Please Fill All Fields")
                 return
+            if avatar_entry.get() not in (1,2,3,4,5,6,7,8):
+                messagebox.showerror("Error","Avatar Must Be Between 1-8")
+                return
+            if role_entry.get() not in ("user","admin"):
+                messagebox.showerror("Error","Role Must Be Either user or admin")
+                return
             try:
                 cur.execute("INSERT INTO user_creds VALUES(:1,:2,:3,:4)",(id_entry.get(),pass_entry.get(),avatar_entry.get(),role_entry.get()))
                 con.commit()
@@ -419,6 +425,12 @@ def adm_panel(ida,passwa):
         def upd_user():
             if(id_entry.get()=="" or pass_entry.get()=="" or avatar_entry.get()=="" or role_entry.get()==""):
                 messagebox.showerror("Error","Please Fill All Fields")
+                return
+            if avatar_entry.get() not in (1,2,3,4,5,6,7,8):
+                messagebox.showerror("Error","Avatar Must Be Between 1-8")
+                return
+            if role_entry.get() not in ("user","admin"):
+                messagebox.showerror("Error","Role Must Be Either user or admin")
                 return
             try:
                 cur.execute("UPDATE user_creds SET pass=:1,avatar=:2,role=:3 WHERE id=:4",(pass_entry.get(),avatar_entry.get(),role_entry.get(),id_entry.get()))
