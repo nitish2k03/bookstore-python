@@ -408,7 +408,7 @@ def adm_panel(ida,passwa):
             if(id_entry.get()=="" or pass_entry.get()=="" or avatar_entry.get()=="" or role_entry.get()==""):
                 messagebox.showerror("Error","Please Fill All Fields")
                 return
-            if avatar_entry.get() not in (1,2,3,4,5,6,7,8):
+            if avatar_entry.get() not in ("1","2","3","4","5","6","7","8"):
                 messagebox.showerror("Error","Avatar Must Be Between 1-8")
                 return
             if role_entry.get() not in ("user","admin"):
@@ -426,7 +426,7 @@ def adm_panel(ida,passwa):
             if(id_entry.get()=="" or pass_entry.get()=="" or avatar_entry.get()=="" or role_entry.get()==""):
                 messagebox.showerror("Error","Please Fill All Fields")
                 return
-            if avatar_entry.get() not in (1,2,3,4,5,6,7,8):
+            if avatar_entry.get() not in ("1","2","3","4","5","6","7","8"):
                 messagebox.showerror("Error","Avatar Must Be Between 1-8")
                 return
             if role_entry.get() not in ("user","admin"):
