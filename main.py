@@ -172,27 +172,6 @@ def register(event):
 
         for label in labels:
             label.bind("<Button-1>", label_click)
-
-
-        # for i in range(0,8):
-        #         ima[i]=Image.open(avatarl[i]).resize((60,60),Image.LANCZOS)
-        #         ima[i]=ImageTk.PhotoImage(ima[i],master=canvas_n)
-        #         ima[i].name = avatarl[i]
-        #         label=Label(canvas_n,image=ima[i])
-        #         label.image=ima[i]
-        #         label.place(x=a,y=b)
-        #         def img_click(event):
-        #             image = event.widget.image
-                    
-        #             global av
-        #             av=avatarl.index(image.name)+1
-        #             print (av)
-        #         label.bind('<Button-1>',img_click)
-        #         a+=80
-        #         if(a>400):
-        #             a=150
-        #             b+=80
-        
         b1=Button(window4,text="Register",bg="white",command=lambda :register_user("<Button-1>"))
         b1.place(x=210,y=350)
         b2=Button(window4,text="Exit",bg="white",command=reg_cancel2)
