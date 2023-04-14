@@ -1060,6 +1060,3 @@ def login():
     canvas.tag_bind(btn4,"<Enter>",on_enter)
     canvas.tag_bind(btn4,"<Leave>",on_leave)
     window.mainloop()
-
-
-login
