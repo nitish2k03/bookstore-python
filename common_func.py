@@ -1,5 +1,3 @@
-import time
-start=time.time()
 import oracledb
 from tkinter import *
 from PIL import ImageTk,Image
@@ -8,11 +6,9 @@ import oracledb
 from datetime import datetime
 import os
 
-print(time.time()-start)
-con=oracledb.connect(user="c##nitish",password="123",dsn="Nitish/orcl")
+con=oracledb.connect(user="c##nitish",password="123",dsn="192.168.159.1/orcl")
 print("Successfully connected to Oracle Database")
 cur=con.cursor()
-print(time.time()-start)
 
 def adm_panel(ida,passwa):
     window3=Tk()
@@ -1064,3 +1060,6 @@ def login():
     canvas.tag_bind(btn4,"<Enter>",on_enter)
     canvas.tag_bind(btn4,"<Leave>",on_leave)
     window.mainloop()
+
+
+login
