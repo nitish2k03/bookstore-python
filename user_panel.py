@@ -40,7 +40,7 @@ def logged(ida,passwa,cur,con):
     data=ttk.Treeview(window,columns=("Id","Title","Author","Genre","Stock","Price"))
     data.configure(selectmode="browse")
     scroll=ttk.Scrollbar(window,orient="vertical",command=data.yview)
-    scroll.place(relheight=0.6,relx=0.505,rely=0.2)
+    scroll.place(relheight=0.78,relx=0.505,rely=0.17)
     data.tag_configure('odd',background="lightblue")
     data.tag_configure('even',background="#ffffff")
     data.configure(yscrollcommand=scroll.set)
@@ -58,7 +58,7 @@ def logged(ida,passwa,cur,con):
     data.heading("Genre",text="Genre")
     data.heading("Stock",text="Stock")
     data.heading("Price",text="Price")
-    data.place(relx=0.01,rely=0.2,relheight=0.6)
+    data.place(relx=0.01,rely=0.17,relheight=0.78)
 
     count=0
     cur.execute("select * from books")
@@ -70,18 +70,18 @@ def logged(ida,passwa,cur,con):
     global cart_count,cart_amount,cart
     cart_count=0
     cart_amount=0.0
-    cart_label=Label(window,text=f"CART ITEMS : [ {cart_count} ]",bg="#808080",fg="#FFFFFF")
+    cart_label=Label(window,text=f"CART ITEMS : [ {cart_count} ]",bg="#808080",fg="#FFFFFF",font=("Arial",10,"bold"))
     cart_label.place(relx=0.68,rely=0.17,relwidth=0.3085)
 
-    cart_amt=Label(window,text=f"CART TOTAL : [ {cart_amount} ]",bg="#808080",fg="#FFFFFF")
+    cart_amt=Label(window,text=f"CART TOTAL : [ {cart_amount} ]",bg="#808080",fg="#FFFFFF",font=("Arial",10,"bold"))
     cart_amt.place(relx=0.68,rely=0.8,relwidth=0.3085)
 
-    label3=Label(window, text="Book Id")
-    label3.place(relx=0.57,rely=0.39)
-    label5 = Label(window, text="")
+    label3=Label(window, text="Book Id",font=("Arial",11,"bold"))
+    label3.place(relx=0.568,rely=0.39)
+    label5 = Label(window, text="",font=("Arial",11,"bold"))
     label5.place(relx=0.58,rely=0.42)
-    label4 = Label(window, text="Quantity*")
-    label4.place(relx=0.57,rely=0.5)
+    label4 = Label(window, text="Quantity *",font=("Arial",11,"bold"))
+    label4.place(relx=0.565,rely=0.5)
     entry1 = Entry(window)
     entry1.place(relx=0.55,rely=0.55)
     def add_to_cart():
@@ -111,7 +111,7 @@ def logged(ida,passwa,cur,con):
                 cart_amount=float("{:.2f}".format(cart_amount))
                 cart_amt.config(text=f"CART TOTAL : [ {cart_amount} ]")
                 cart_label.config(text=f"CART ITEMS : [ {cart_count} ]")
-    butt1=Button(window,text="Add to Cart ->",command=add_to_cart)
+    butt1=Button(window,text="Add to Cart -->",command=add_to_cart)
     butt1.place(relx=0.56,rely=0.6)
     def update_info(event):
         curItem=data.focus()
