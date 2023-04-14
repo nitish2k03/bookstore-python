@@ -1,4 +1,3 @@
-import oracledb
 from tkinter import *
 from tkinter import ttk,messagebox
 from PIL import ImageTk,Image
@@ -6,10 +5,8 @@ import main
 from datetime import datetime
 import os
 
-con=oracledb.connect(user="C##Nitish",password="123",dsn="Nitish/orcl")
-cur=con.cursor()
 
-def logged(ida,passwa):
+def logged(ida,passwa,cur,con):
     window=Tk()
     window.title("Book Store Management System")
     window.maxsize(height="700",width="1400")

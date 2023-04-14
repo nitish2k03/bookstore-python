@@ -5,8 +5,7 @@ from tkinter import messagebox
 import user_panel
 import admin_panel
 
-
-con=oracledb.connect(user="c##nitish",password="123",dsn="Nitish/orcl")
+con=oracledb.connect(user="c##nitish",password="123",dsn="192.168.159.1/orcl")
 print("Successfully connected to Oracle Database")
 cur=con.cursor()
 
@@ -86,9 +85,9 @@ def check(event):
     if (data):
         window.withdraw()
         if(data[0][3]=="admin"):
-            admin_panel.adm_panel(e1.get(),e2.get())
+            admin_panel.adm_panel(e1.get(),e2.get(),cur,con)
         else:
-            user_panel.logged(e1.get(),e2.get())
+            user_panel.logged(e1.get(),e2.get(),cur,con)
     else:
         messagebox.showerror("Error","Invalid Username or Password")
 

@@ -1,14 +1,10 @@
 from tkinter import *
 from PIL import ImageTk,Image
 import main
-import oracledb
-from tkinter import ttk
-from tkinter import messagebox 
+from tkinter import ttk,messagebox
 
-con=oracledb.connect(user="C##Nitish",password="123",dsn="Nitish/orcl")
-cur=con.cursor()
 
-def adm_panel(ida,passwa):
+def adm_panel(ida,passwa,cur,con):
     window3=Tk()
     window3.iconbitmap("./media/favicon.ico")
     window3.title("Book Store Management System")
