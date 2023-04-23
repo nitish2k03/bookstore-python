@@ -29,8 +29,8 @@ def adm_panel(ida,passwa,cur,con):
 
     def on_leave(event):
         canvas3.configure(cursor="")
-
-    
+    global open_inv_clicked
+    open_inv_clicked=False
     users_s=Image.open("./media/users_sel.png").resize((150,35),Image.LANCZOS)
     users_s=ImageTk.PhotoImage(users_s,master=canvas3)
 
@@ -74,7 +74,6 @@ def adm_panel(ida,passwa,cur,con):
             canvas3.tag_bind(but2,"<Button-1>",users_change)
             canvas3.itemconfig(but3,image=trans_u)  
             canvas3.tag_bind(but3,"<Button-1>",trans_change)
-            books_cle()
         books_show(event)
 
     def users_unchange(event):
@@ -90,10 +89,7 @@ def adm_panel(ida,passwa,cur,con):
             canvas3.tag_bind(but1,"<Button-1>",books_change)
             canvas3.itemconfig(but3,image=trans_u)
             canvas3.tag_bind(but3,"<Button-1>",trans_change)
-            users_cle()
         users_show(event)
-        
-
 
     def trans_unchange(event):
         canvas3.itemconfig(but3,image=trans_u)
@@ -109,21 +105,7 @@ def adm_panel(ida,passwa,cur,con):
             canvas3.tag_bind(but1,"<Button-1>",books_change)
             canvas3.itemconfig(but2,image=users_u)
             canvas3.tag_bind(but2,"<Button-1>",users_change)
-            if selection1:
-                selection1.place_forget()
-                book_frame.place_forget()
-                search_box.place_forget()
-                scroll.place_forget()
-                record_frame.place_forget()
-            if selection2:
-                selection2.place_forget()
-                records_frame.place_forget()
-                user_frame.place_forget()
         trans_show(event)
-
-
-
-
 
     but1=canvas3.create_image(30,400,image=books_u,anchor=NW)
     canvas3.tag_bind(but1,"<Button-1>",books_change)
@@ -140,39 +122,9 @@ def adm_panel(ida,passwa,cur,con):
     canvas3.tag_bind(but3,"<Enter>",on_enter)
     canvas3.tag_bind(but3,"<Leave>",on_leave)
 
-
-    search_box=Entry(canvas3)
-    search_box.place(relheight=0.05,relwidth=0.4,relx=0.2,rely=0.03)
-    search_box.insert(0,"Search Here by Book Title")
-    def search_box_click(event):
-        search_box.delete(0,END)
-        search_box.unbind("<Button-1>")
-    search_box.bind("<Button-1>",search_box_click)
-    def upd_data(event):
-        data.delete(*data.get_children())
-        val=search_box.get()
-        cur.execute("SELECT * FROM books WHERE lower(title) LIKE '%"+val+"%'")
-        if len(search_box.get())>0:
-            count=0
-            for row in cur.fetchall():
-                    data.insert(parent='',index='end',iid=row[0],values=row,tags=('even' if count%2==0 else 'odd',))
-                    count+=1
-
-        if len(search_box.get())==0:
-                        data.delete(*data.get_children())
-                        cur.execute("SELECT * FROM books")
-                        count=0
-                        for row in cur.fetchall():
-                            data.insert(parent='',index='end',iid=row[0],values=row,tags=('even' if count%2==0 else 'odd',))
-                            count+=1
-                    
-
-    search_box.bind("<KeyRelease>",upd_data)
-
     def books_show(event):
         canvas3.itemconfig(but1,image=books_s)
-        search_box.place(relheight=0.05,relwidth=0.4,relx=0.2,rely=0.03)
-        global data,scroll
+        global data,scroll,open_inv_clicked
         data=ttk.Treeview(canvas3,columns=("Id","Title","Author","Genre","Stock","Price"),height=10)
         data.configure(selectmode="browse")
         scroll=ttk.Scrollbar(canvas3,orient="vertical",command=data.yview)
@@ -200,7 +152,34 @@ def adm_panel(ida,passwa,cur,con):
         for i in books:
             data.insert(parent="",index="end",iid=i[0],values=i,tags=('even' if count%2==0 else 'odd',))
             count+=1
+        search_box=Entry(canvas3)
+        search_box.place(relheight=0.05,relwidth=0.4,relx=0.2,rely=0.03)
+        search_box.insert(0,"Search Here by Book Title")
+        def search_box_click(event):
+            search_box.delete(0,END)
+            search_box.unbind("<Button-1>")
+        search_box.bind("<Button-1>",search_box_click)
+        def upd_data(event):
+            data.delete(*data.get_children())
+            val=search_box.get()
+            cur.execute("SELECT * FROM books WHERE lower(title) LIKE '%"+val+"%'")
+            if len(search_box.get())>0:
+                count=0
+                for row in cur.fetchall():
+                        data.insert(parent='',index='end',iid=row[0],values=row,tags=('even' if count%2==0 else 'odd',))
+                        count+=1
 
+            if len(search_box.get())==0:
+                            data.delete(*data.get_children())
+                            cur.execute("SELECT * FROM books")
+                            count=0
+                            for row in cur.fetchall():
+                                data.insert(parent='',index='end',iid=row[0],values=row,tags=('even' if count%2==0 else 'odd',))
+                                count+=1
+        search_box.bind("<KeyRelease>",upd_data)
+        if open_inv_clicked:
+            open_inv_clicked=False
+            open_inv_but.place_forget()
         global record_frame,book_frame
         record_frame=LabelFrame(canvas3,text="Record")
         record_frame.place(relheight=0.2,relwidth=0.8,relx=0.18,rely=0.6)
@@ -327,11 +306,41 @@ def adm_panel(ida,passwa,cur,con):
     print("success")
 
     def users_show(event):
+        if scroll:
+            scroll.place_forget()
+        global data,search_box2,open_inv_clicked
+        if open_inv_clicked:
+            open_inv_clicked=False
+            open_inv_but.place_forget()
         canvas3.itemconfig(but2,image=users_s)
         cur.execute("select * from user_creds")
         users=cur.fetchall()
-        global data
         data=ttk.Treeview(canvas3,height=10)
+        search_box2=Entry(canvas3)
+        search_box2.place(relheight=0.05,relwidth=0.4,relx=0.2,rely=0.03)
+        search_box2.insert(0,"Search Here by User Id")
+        def search_box_click2(event):
+            search_box2.delete(0,END)
+            search_box2.unbind("<Button-1>")
+        search_box2.bind("<Button-1>",search_box_click2)
+        def upd_data(event):
+            data.delete(*data.get_children())
+            val=search_box2.get()
+            cur.execute("SELECT * FROM user_creds WHERE lower(id) LIKE '%"+val+"%'")
+            if len(search_box2.get())>0:
+                count=0
+                for row in cur.fetchall():
+                        data.insert(parent='',index='end',iid=row[0],values=row,tags=('even' if count%2==0 else 'odd',))
+                        count+=1
+
+            if len(search_box2.get())==0:
+                            data.delete(*data.get_children())
+                            cur.execute("SELECT * FROM user_creds")
+                            count=0
+                            for row in cur.fetchall():
+                                data.insert(parent='',index='end',iid=row[0],values=row,tags=('even' if count%2==0 else 'odd',))
+                                count+=1
+        search_box2.bind("<KeyRelease>",upd_data)
         global count
         count=0
         data.tag_configure('odd',background="lightblue")
@@ -374,7 +383,6 @@ def adm_panel(ida,passwa,cur,con):
     
         user_frame=LabelFrame(canvas3,text="Commands")
         user_frame.place(relheight=0.1,relwidth=0.8,relx=0.18,rely=0.85)
-        global selection2
         def sel2():
             clea()
             curItem=data.focus()
@@ -393,9 +401,7 @@ def adm_panel(ida,passwa,cur,con):
             avatar_entry.delete(0,END)
             role_entry.delete(0,END)
 
-        selection2=Button(canvas3,text="Fetch Record",command=sel2)
-        selection2.place(relheight=0.05,relwidth=0.1,relx=0.5,rely=0.54)
-
+        selection1.configure(command=sel2)
         def upd_tree():
             data.delete(*data.get_children())
             cur.execute("select * from user_creds")
@@ -464,8 +470,11 @@ def adm_panel(ida,passwa,cur,con):
         b4.place(relheight=0.6,relwidth=0.15,relx=0.82,rely=0.1)
 
     def trans_show(event):
+        if scroll:
+            scroll.place_forget()
         canvas3.itemconfigure(but3,image=trans_s) 
-        global data
+        global data,open_inv_clicked
+        open_inv_clicked=True
         data=ttk.Treeview(canvas3,columns=("inv_id","name","user","path","date"),show="headings")
         data.tag_configure('odd',background="white")
         data.tag_configure('even',background="lightblue")
@@ -516,29 +525,29 @@ def adm_panel(ida,passwa,cur,con):
         recordss_frame=LabelFrame(canvas3,text="Records")
         recordss_frame.place(relheight=0.2,relwidth=0.8,relx=0.18,rely=0.6)
         id_label=Label(recordss_frame,text="Id")
-        id_label.place(relheight=0.3,relx=0.2,rely=0.1)
+        id_label.place(relheight=0.3,relx=0.06,rely=0.1)
         id_entry=Entry(recordss_frame)
-        id_entry.place(relheight=0.25,relwidth=0.2,relx=0.25,rely=0.1)
-        cust_name_label=Label(recordss_frame,text="Customer Name")
-        cust_name_label.place(relheight=0.3,relx=0.18,rely=0.5)
+        id_entry.place(relheight=0.25,relwidth=0.2,relx=0.10,rely=0.1)
+        cust_name_label=Label(recordss_frame,text="Customer")
+        cust_name_label.place(relheight=0.3,relx=0.02,rely=0.5)
         cust_name_entry=Entry(recordss_frame)
-        cust_name_entry.place(relheight=0.25,relwidth=0.2,relx=0.25,rely=0.5)
+        cust_name_entry.place(relheight=0.25,relwidth=0.2,relx=0.10,rely=0.5)
         clerk_label=Label(recordss_frame,text="Clerk")
-        clerk_label.place(relheight=0.3,relx=0.55,rely=0.1)
+        clerk_label.place(relheight=0.3,relx=0.36,rely=0.1)
         clerk_entry=Entry(recordss_frame)
-        clerk_entry.place(relheight=0.25,relwidth=0.2,relx=0.60,rely=0.1)
+        clerk_entry.place(relheight=0.25,relwidth=0.2,relx=0.43,rely=0.1)
         path_label=Label(recordss_frame,text="Inv Path")
-        path_label.place(relheight=0.3,relx=0.55,rely=0.5)
+        path_label.place(relheight=0.3,relx=0.36,rely=0.5)
         path_entry=Entry(recordss_frame)
-        path_entry.place(relheight=0.25,relwidth=0.2,relx=0.60,rely=0.5)
+        path_entry.place(relheight=0.25,relwidth=0.2,relx=0.43,rely=0.5)
         date_label=Label(recordss_frame,text="Date")
-        date_label.place(relheight=0.3,relx=0.2,rely=0.9)
+        date_label.place(relheight=0.3,relx=0.72,rely=0.3)
         date_entry=Entry(recordss_frame)
-        date_entry.place(relheight=0.25,relwidth=0.2,relx=0.25,rely=0.9)
+        date_entry.place(relheight=0.25,relwidth=0.2,relx=0.78,rely=0.3)
 
         trans_frame=LabelFrame(canvas3,text="Commands")
         trans_frame.place(relheight=0.1,relwidth=0.8,relx=0.18,rely=0.85)
-        global selection3,open_inv_but
+        global open_inv_but
         def sel3():
             clear()
             curItem=data.focus()
@@ -552,7 +561,7 @@ def adm_panel(ida,passwa,cur,con):
             clerk_entry.insert(0,data.item(curItem)['values'][2])
             path_entry.insert(0,data.item(curItem)['values'][3])
             date_entry.insert(0,data.item(curItem)['values'][4])
-        
+        selection1.configure(command=sel3)
         def clear():
             id_entry.delete(0,END)
             cust_name_entry.delete(0,END)
@@ -565,8 +574,6 @@ def adm_panel(ida,passwa,cur,con):
             path=data.item(curItem)['values'][3]
             os.startfile(path)
 
-        selection3=Button(canvas3,text="Fetch Record",command=sel3)
-        selection3.place(relheight=0.05,relwidth=0.1,relx=0.45,rely=0.54)
         open_inv_but=Button(canvas3,text="Open Invoice",command=open_inv)
         open_inv_but.place(relheight=0.05,relwidth=0.1,relx=0.65,rely=0.54)
         def upd_tree():
@@ -632,35 +639,10 @@ def adm_panel(ida,passwa,cur,con):
         b1=Button(trans_frame,text="Add Invoice",command=add)
         b1.place(relheight=0.6,relwidth=0.1,relx=0.04,rely=0.1)
         b2=Button(trans_frame,text="Update Invoice",command=update)
-        b2.place(relheight=0.6,relwidth=0.1,relx=0.16,rely=0.1)
+        b2.place(relheight=0.6,relwidth=0.1,relx=0.32,rely=0.1)
         b3=Button(trans_frame,text="Delete Invoice",command=delete)
-        b3.place(relheight=0.6,relwidth=0.1,relx=0.28,rely=0.1)
+        b3.place(relheight=0.6,relwidth=0.1,relx=0.58,rely=0.1)
         b4=Button(trans_frame,text="Clear All Fields",command=clear)
-        b4.place(relheight=0.6,relwidth=0.1,relx=0.4,rely=0.1)
-
-    def books_cle():
-        if selection2:
-            selection2.place_forget()
-            records_frame.place_forget()
-            user_frame.place_forget()
-        if selection3:
-            selection3.place_forget()
-            recordss_frame.place_forget()
-            trans_frame.place_forget()
-            search_box3.place_forget()
-            open_inv_but.place_forget()
-    def users_cle():
-        if selection1:
-                selection1.place_forget()
-                book_frame.place_forget()
-                search_box.place_forget()
-                scroll.place_forget()
-                record_frame.place_forget()
-        if selection3:
-            selection3.place_forget()
-            recordss_frame.place_forget()
-            trans_frame.place_forget()
-            search_box3.place_forget()
-            open_inv_but.place_forget()
+        b4.place(relheight=0.6,relwidth=0.1,relx=0.84,rely=0.1)
 
     window3.mainloop()
