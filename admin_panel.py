@@ -55,20 +55,16 @@ def adm_panel(ida,passwa,cur,con):
     logout_but=canvas3.create_image(1135,15,image=logout,anchor=NW)
 
 
-
     def logout_method(event):
         window3.destroy()
         main.login()
     canvas3.tag_bind(logout_but,"<Button-1>",logout_method)
     canvas3.tag_bind(logout_but,"<Enter>",on_enter)
     canvas3.tag_bind(logout_but,"<Leave>",on_leave)
-    
-
     def books_unchange(event):
         canvas3.itemconfig(but1,image=books_u)
         canvas3.tag_bind(but1,"<Button-1>",books_change)
         data.destroy()
-
     def books_change(event):
         canvas3.itemconfig(but1,image=books_s)
         canvas3.tag_bind(but1,"<Button-1>",books_unchange)
@@ -78,10 +74,8 @@ def adm_panel(ida,passwa,cur,con):
             canvas3.tag_bind(but2,"<Button-1>",users_change)
             canvas3.itemconfig(but3,image=trans_u)  
             canvas3.tag_bind(but3,"<Button-1>",trans_change)
+            books_cle()
         books_show(event)
-        selection2.place_forget()
-        records_frame.place_forget()
-        user_frame.place_forget()
 
     def users_unchange(event):
         canvas3.itemconfig(but2,image=users_u)
@@ -96,11 +90,10 @@ def adm_panel(ida,passwa,cur,con):
             canvas3.tag_bind(but1,"<Button-1>",books_change)
             canvas3.itemconfig(but3,image=trans_u)
             canvas3.tag_bind(but3,"<Button-1>",trans_change)
-        search_box.place_forget()
-        record_frame.place_forget()
-        book_frame.place_forget()
-        selection1.place_forget()
+            users_cle()
         users_show(event)
+        
+
 
     def trans_unchange(event):
         canvas3.itemconfig(but3,image=trans_u)
@@ -116,7 +109,19 @@ def adm_panel(ida,passwa,cur,con):
             canvas3.tag_bind(but1,"<Button-1>",books_change)
             canvas3.itemconfig(but2,image=users_u)
             canvas3.tag_bind(but2,"<Button-1>",users_change)
+            if selection1:
+                selection1.place_forget()
+                book_frame.place_forget()
+                search_box.place_forget()
+                scroll.place_forget()
+                record_frame.place_forget()
+            if selection2:
+                selection2.place_forget()
+                records_frame.place_forget()
+                user_frame.place_forget()
         trans_show(event)
+
+
 
 
 
@@ -167,10 +172,7 @@ def adm_panel(ida,passwa,cur,con):
     def books_show(event):
         canvas3.itemconfig(but1,image=books_s)
         search_box.place(relheight=0.05,relwidth=0.4,relx=0.2,rely=0.03)
-        global data
-        style=ttk.Style()
-        # style.theme_use('default')
-        style.configure("Treeview",background="black",foreground="white",rowheight=25,fieldbackground="#ffffff")
+        global data,scroll
         data=ttk.Treeview(canvas3,columns=("Id","Title","Author","Genre","Stock","Price"),height=10)
         data.configure(selectmode="browse")
         scroll=ttk.Scrollbar(canvas3,orient="vertical",command=data.yview)
@@ -477,13 +479,188 @@ def adm_panel(ida,passwa,cur,con):
         data.heading("user",text="Billing Clerk")
         data.heading("path",text="Invoice Path")
         data.heading("date",text="Date Created")
-        data.place(relheight=0.4,relwidth=0.8,relx=0.18,rely=0.1)
+        data.place(relwidth=0.8,relx=0.18,rely=0.15)
         cur.execute("select * from transactions")
         bot=cur.fetchall()
         count=0
         for i in bot:
             data.insert(parent="",index="end",iid=i[0],values=i,tags=('even' if count%2==0 else 'odd',))
             count+=1
+        global search_box3
+        search_box3=Entry(canvas3)
+        search_box3.place(relheight=0.05,relwidth=0.4,relx=0.2,rely=0.03)
+        search_box3.insert(0,"Search Here by Invoice Id")
+        def search_box_click3(event):
+            search_box3.delete(0,END)
+            search_box3.unbind("<Button-1>")
+        search_box3.bind("<Button-1>",search_box_click3)
+        def upd_data3(event):
+            data.delete(*data.get_children())
+            val=search_box3.get()
+            cur.execute("SELECT * FROM transactions WHERE inv_id like '%"+val+"%'")
+            if len(search_box3.get())>0:
+                count=0
+                for row in cur.fetchall():
+                        data.insert(parent='',index='end',iid=row[0],values=row,tags=('even' if count%2==0 else 'odd',))
+                        count+=1
+            if len(search_box3.get())==0:
+                            data.delete(*data.get_children())
+                            cur.execute("SELECT * FROM transactions")
+                            count=0
+                            for row in cur.fetchall():
+                                data.insert(parent='',index='end',iid=row[0],values=row,tags=('even' if count%2==0 else 'odd',))
+                                count+=1
+
+        search_box3.bind("<KeyRelease>",upd_data3)
+        global recordss_frame,trans_frame
+        recordss_frame=LabelFrame(canvas3,text="Records")
+        recordss_frame.place(relheight=0.2,relwidth=0.8,relx=0.18,rely=0.6)
+        id_label=Label(recordss_frame,text="Id")
+        id_label.place(relheight=0.3,relx=0.2,rely=0.1)
+        id_entry=Entry(recordss_frame)
+        id_entry.place(relheight=0.25,relwidth=0.2,relx=0.25,rely=0.1)
+        cust_name_label=Label(recordss_frame,text="Customer Name")
+        cust_name_label.place(relheight=0.3,relx=0.18,rely=0.5)
+        cust_name_entry=Entry(recordss_frame)
+        cust_name_entry.place(relheight=0.25,relwidth=0.2,relx=0.25,rely=0.5)
+        clerk_label=Label(recordss_frame,text="Clerk")
+        clerk_label.place(relheight=0.3,relx=0.55,rely=0.1)
+        clerk_entry=Entry(recordss_frame)
+        clerk_entry.place(relheight=0.25,relwidth=0.2,relx=0.60,rely=0.1)
+        path_label=Label(recordss_frame,text="Inv Path")
+        path_label.place(relheight=0.3,relx=0.55,rely=0.5)
+        path_entry=Entry(recordss_frame)
+        path_entry.place(relheight=0.25,relwidth=0.2,relx=0.60,rely=0.5)
+        date_label=Label(recordss_frame,text="Date")
+        date_label.place(relheight=0.3,relx=0.2,rely=0.9)
+        date_entry=Entry(recordss_frame)
+        date_entry.place(relheight=0.25,relwidth=0.2,relx=0.25,rely=0.9)
+
+        trans_frame=LabelFrame(canvas3,text="Commands")
+        trans_frame.place(relheight=0.1,relwidth=0.8,relx=0.18,rely=0.85)
+        global selection3,open_inv_but
+        def sel3():
+            clear()
+            curItem=data.focus()
+            id_entry.delete(0,END)
+            cust_name_entry.delete(0,END)
+            clerk_entry.delete(0,END)
+            path_entry.delete(0,END)
+            date_entry.delete(0,END)
+            id_entry.insert(0,data.item(curItem)['values'][0])
+            cust_name_entry.insert(0,data.item(curItem)['values'][1])
+            clerk_entry.insert(0,data.item(curItem)['values'][2])
+            path_entry.insert(0,data.item(curItem)['values'][3])
+            date_entry.insert(0,data.item(curItem)['values'][4])
         
+        def clear():
+            id_entry.delete(0,END)
+            cust_name_entry.delete(0,END)
+            clerk_entry.delete(0,END)
+            path_entry.delete(0,END)
+            date_entry.delete(0,END)
+        import os
+        def open_inv():
+            curItem=data.focus()
+            path=data.item(curItem)['values'][3]
+            os.startfile(path)
+
+        selection3=Button(canvas3,text="Fetch Record",command=sel3)
+        selection3.place(relheight=0.05,relwidth=0.1,relx=0.45,rely=0.54)
+        open_inv_but=Button(canvas3,text="Open Invoice",command=open_inv)
+        open_inv_but.place(relheight=0.05,relwidth=0.1,relx=0.65,rely=0.54)
+        def upd_tree():
+            data.delete(*data.get_children())
+            cur.execute("SELECT * FROM transactions")
+            count=0
+            for row in cur.fetchall():
+                data.insert(parent='',index='end',iid=row[0],values=row,tags=('even' if count%2==0 else 'odd',))
+                count+=1
+        def add():
+            if len(id_entry.get())==0 or len(cust_name_entry.get())==0 or len(clerk_entry.get())==0 or len(path_entry.get())==0 or len(date_entry.get())==0:
+                messagebox.showerror("Error","All Fields are Required")
+                return
+            clerks=[]
+            cur.execute("SELECT * FROM users")
+            for row in cur.fetchall():
+                clerks.append(row[0])
+            if clerk_entry.get() not in clerks:
+                messagebox.showerror("Error","Clerk Not Found")
+                return
+            try:
+                cur.execute("INSERT INTO transactions VALUES (:inv_id,:cust_name,:clerk,:inv_path,:date)",{'inv_id':id_entry.get(),'cust_name':cust_name_entry.get(),'clerk':clerk_entry.get(),'inv_path':path_entry.get(),'date':date_entry.get()})
+                con.commit()
+                messagebox.showinfo("Success","Record Added Successfully")
+            except:
+                messagebox.showerror("Error","Can't Add This Record")
+            clear()
+            upd_tree()
+        def delete():
+            if len(id_entry.get())==0:
+                messagebox.showerror("Error","Id Field is Required")
+                return
+            try:
+                cur.execute("DELETE FROM transactions WHERE inv_id=:inv_id",{'inv_id':id_entry.get()})
+                con.commit()
+                os.remove(path_entry.get())
+                messagebox.showinfo("Success","Record Deleted Successfully")
+
+            except:
+                messagebox.showerror("Error","Can't Delete This Record")
+            clear()
+            upd_tree()
+                
+        def update():
+            if len(id_entry.get())==0 or len(cust_name_entry.get())==0 or len(clerk_entry.get())==0 or len(path_entry.get())==0 or len(date_entry.get())==0:
+                messagebox.showerror("Error","All Fields are Required")
+                return
+            clerks=[]
+            cur.execute("SELECT * FROM users")
+            for row in cur.fetchall():
+                clerks.append(row[1])
+            if(clerk_entry.get() not in clerks):
+                messagebox.showerror("Error","Clerk Not Found")
+                return
+            try:
+                cur.execute("UPDATE transactions SET name=:name,user=:user,path=:path,date=:date WHERE inv_id=:inv_id",{ 'name':cust_name_entry.get(),'user':clerk_entry.get(),'path':path_entry.get(),'date':date_entry.get(),'inv_id':id_entry.get()})
+                con.commit()
+                messagebox.showinfo("Success","Record Updated Successfully")
+            except:
+                messagebox.showerror("Error","Something Went Wrong")
+            clear()
+            upd_tree()
+        b1=Button(trans_frame,text="Add Invoice",command=add)
+        b1.place(relheight=0.6,relwidth=0.1,relx=0.04,rely=0.1)
+        b2=Button(trans_frame,text="Update Invoice",command=update)
+        b2.place(relheight=0.6,relwidth=0.1,relx=0.16,rely=0.1)
+        b3=Button(trans_frame,text="Delete Invoice",command=delete)
+        b3.place(relheight=0.6,relwidth=0.1,relx=0.28,rely=0.1)
+        b4=Button(trans_frame,text="Clear All Fields",command=clear)
+        b4.place(relheight=0.6,relwidth=0.1,relx=0.4,rely=0.1)
+
+    def books_cle():
+        if selection2:
+            selection2.place_forget()
+            records_frame.place_forget()
+            user_frame.place_forget()
+        if selection3:
+            selection3.place_forget()
+            recordss_frame.place_forget()
+            trans_frame.place_forget()
+            search_box3.place_forget()
+            open_inv_but.place_forget()
+    def users_cle():
+        if selection1:
+                selection1.place_forget()
+                book_frame.place_forget()
+                search_box.place_forget()
+                scroll.place_forget()
+                record_frame.place_forget()
+        if selection3:
+            selection3.place_forget()
+            recordss_frame.place_forget()
+            trans_frame.place_forget()
+            search_box3.place_forget()
+            open_inv_but.place_forget()
 
     window3.mainloop()
