@@ -29,8 +29,6 @@ def adm_panel(ida,passwa,cur,con):
 
     def on_leave(event):
         canvas3.configure(cursor="")
-    global open_inv_clicked
-    open_inv_clicked=False
     users_s=Image.open("./media/users_sel.png").resize((150,35),Image.LANCZOS)
     users_s=ImageTk.PhotoImage(users_s,master=canvas3)
 
@@ -124,7 +122,7 @@ def adm_panel(ida,passwa,cur,con):
 
     def books_show(event):
         canvas3.itemconfig(but1,image=books_s)
-        global data,scroll,open_inv_clicked
+        global data,scroll
         data=ttk.Treeview(canvas3,columns=("Id","Title","Author","Genre","Stock","Price"),height=10)
         data.configure(selectmode="browse")
         scroll=ttk.Scrollbar(canvas3,orient="vertical",command=data.yview)
@@ -177,9 +175,6 @@ def adm_panel(ida,passwa,cur,con):
                                 data.insert(parent='',index='end',iid=row[0],values=row,tags=('even' if count%2==0 else 'odd',))
                                 count+=1
         search_box.bind("<KeyRelease>",upd_data)
-        if open_inv_clicked:
-            open_inv_clicked=False
-            open_inv_but.place_forget()
         global record_frame,book_frame
         record_frame=LabelFrame(canvas3,text="Record")
         record_frame.place(relheight=0.2,relwidth=0.8,relx=0.18,rely=0.6)
@@ -308,10 +303,7 @@ def adm_panel(ida,passwa,cur,con):
     def users_show(event):
         if scroll:
             scroll.place_forget()
-        global data,search_box2,open_inv_clicked
-        if open_inv_clicked:
-            open_inv_clicked=False
-            open_inv_but.place_forget()
+        global data,search_box2
         canvas3.itemconfig(but2,image=users_s)
         cur.execute("select * from user_creds")
         users=cur.fetchall()
@@ -473,8 +465,7 @@ def adm_panel(ida,passwa,cur,con):
         if scroll:
             scroll.place_forget()
         canvas3.itemconfigure(but3,image=trans_s) 
-        global data,open_inv_clicked
-        open_inv_clicked=True
+        global data
         data=ttk.Treeview(canvas3,columns=("inv_id","name","user","path","date"),show="headings")
         data.tag_configure('odd',background="white")
         data.tag_configure('even',background="lightblue")
@@ -547,7 +538,6 @@ def adm_panel(ida,passwa,cur,con):
 
         trans_frame=LabelFrame(canvas3,text="Commands")
         trans_frame.place(relheight=0.1,relwidth=0.8,relx=0.18,rely=0.85)
-        global open_inv_but
         def sel3():
             clear()
             curItem=data.focus()
@@ -573,9 +563,6 @@ def adm_panel(ida,passwa,cur,con):
             curItem=data.focus()
             path=data.item(curItem)['values'][3]
             os.startfile(path)
-
-        open_inv_but=Button(canvas3,text="Open Invoice",command=open_inv)
-        open_inv_but.place(relheight=0.05,relwidth=0.1,relx=0.65,rely=0.54)
         def upd_tree():
             data.delete(*data.get_children())
             cur.execute("SELECT * FROM transactions")
@@ -583,25 +570,6 @@ def adm_panel(ida,passwa,cur,con):
             for row in cur.fetchall():
                 data.insert(parent='',index='end',iid=row[0],values=row,tags=('even' if count%2==0 else 'odd',))
                 count+=1
-        def add():
-            if len(id_entry.get())==0 or len(cust_name_entry.get())==0 or len(clerk_entry.get())==0 or len(path_entry.get())==0 or len(date_entry.get())==0:
-                messagebox.showerror("Error","All Fields are Required")
-                return
-            clerks=[]
-            cur.execute("SELECT * FROM users")
-            for row in cur.fetchall():
-                clerks.append(row[0])
-            if clerk_entry.get() not in clerks:
-                messagebox.showerror("Error","Clerk Not Found")
-                return
-            try:
-                cur.execute("INSERT INTO transactions VALUES (:inv_id,:cust_name,:clerk,:inv_path,:date)",{'inv_id':id_entry.get(),'cust_name':cust_name_entry.get(),'clerk':clerk_entry.get(),'inv_path':path_entry.get(),'date':date_entry.get()})
-                con.commit()
-                messagebox.showinfo("Success","Record Added Successfully")
-            except:
-                messagebox.showerror("Error","Can't Add This Record")
-            clear()
-            upd_tree()
         def delete():
             if len(id_entry.get())==0:
                 messagebox.showerror("Error","Id Field is Required")
@@ -616,33 +584,11 @@ def adm_panel(ida,passwa,cur,con):
                 messagebox.showerror("Error","Can't Delete This Record")
             clear()
             upd_tree()
-                
-        def update():
-            if len(id_entry.get())==0 or len(cust_name_entry.get())==0 or len(clerk_entry.get())==0 or len(path_entry.get())==0 or len(date_entry.get())==0:
-                messagebox.showerror("Error","All Fields are Required")
-                return
-            clerks=[]
-            cur.execute("SELECT * FROM users")
-            for row in cur.fetchall():
-                clerks.append(row[1])
-            if(clerk_entry.get() not in clerks):
-                messagebox.showerror("Error","Clerk Not Found")
-                return
-            try:
-                cur.execute("UPDATE transactions SET name=:name,user=:user,path=:path,date=:date WHERE inv_id=:inv_id",{ 'name':cust_name_entry.get(),'user':clerk_entry.get(),'path':path_entry.get(),'date':date_entry.get(),'inv_id':id_entry.get()})
-                con.commit()
-                messagebox.showinfo("Success","Record Updated Successfully")
-            except:
-                messagebox.showerror("Error","Something Went Wrong")
-            clear()
-            upd_tree()
-        b1=Button(trans_frame,text="Add Invoice",command=add)
-        b1.place(relheight=0.6,relwidth=0.1,relx=0.04,rely=0.1)
-        b2=Button(trans_frame,text="Update Invoice",command=update)
-        b2.place(relheight=0.6,relwidth=0.1,relx=0.32,rely=0.1)
+        b1=Button(trans_frame,text="Open Invoice",command=open_inv)
+        b1.place(relheight=0.6,relwidth=0.1,relx=0.175,rely=0.1)
         b3=Button(trans_frame,text="Delete Invoice",command=delete)
-        b3.place(relheight=0.6,relwidth=0.1,relx=0.58,rely=0.1)
+        b3.place(relheight=0.6,relwidth=0.1,relx=0.45,rely=0.1)
         b4=Button(trans_frame,text="Clear All Fields",command=clear)
-        b4.place(relheight=0.6,relwidth=0.1,relx=0.84,rely=0.1)
+        b4.place(relheight=0.6,relwidth=0.1,relx=0.725,rely=0.1)
 
     window3.mainloop()
