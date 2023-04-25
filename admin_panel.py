@@ -575,9 +575,9 @@ def adm_panel(ida,passwa,cur,con):
                 messagebox.showerror("Error","Id Field is Required")
                 return
             try:
+                os.remove(path_entry.get())
                 cur.execute("DELETE FROM transactions WHERE inv_id=:inv_id",{'inv_id':id_entry.get()})
                 con.commit()
-                os.remove(path_entry.get())
                 messagebox.showinfo("Success","Record Deleted Successfully")
 
             except:
